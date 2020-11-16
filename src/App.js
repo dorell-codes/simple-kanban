@@ -38,12 +38,24 @@ function App() {
 
   const handleClickAddColumn = (e) => {
     const label = prompt("What's the column name?");
-    setColumns([...columns, { label, id: label.toLowerCase() }]);
+    label && setColumns([...columns, { label, id: label.toLowerCase() }]);
+  };
+
+  const handleClickDeleteColumn = (columnId) => {
+    setColumns((column) => columns.filter((column) => column.id !== columnId));
   };
 
   const handleClickAddTask = (columnId) => {
     const label = prompt("What's the task name?");
-    setTasks([...tasks, { label, id: label.toLowerCase(), column: columnId }]);
+    label &&
+      setTasks([
+        ...tasks,
+        { label, id: label.toLowerCase(), column: columnId },
+      ]);
+  };
+
+  const handleClickDeleteTask = (taskId) => {
+    setTasks((task) => tasks.filter((task) => task.id !== taskId));
   };
 
   return (
@@ -60,7 +72,12 @@ function App() {
               .map((task) => (
                 <p className="task" key={task.id}>
                   {task.label}
-                  <button style={{ marginLeft: 5 }}>Delete</button>
+                  <button
+                    style={{ marginLeft: 5 }}
+                    onClick={() => handleClickDeleteTask(task.id)}
+                  >
+                    Delete
+                  </button>
                 </p>
               ))}
 
@@ -68,7 +85,11 @@ function App() {
               Add Task
             </button>
             {/* Show only if column has no tasks */}
-            <button>Remove Column</button>
+            {tasks.filter((task) => task.column === column.id).length <= 0 && (
+              <button onClick={() => handleClickDeleteColumn(column.id)}>
+                Remove Column
+              </button>
+            )}
           </div>
         ))}
 
