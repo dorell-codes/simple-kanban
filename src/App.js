@@ -38,12 +38,28 @@ function App() {
 
   const handleClickAddColumn = (e) => {
     const label = prompt("What's the column name?");
-    setColumns([...columns, { label, id: label.toLowerCase() }]);
+    label && setColumns([...columns, { label, id: label.toLowerCase() }]);
+  };
+
+  const handleClickDeleteColumn = (columnId) => {
+    setColumns(columns.filter((column) => column.id !== columnId));
   };
 
   const handleClickAddTask = (columnId) => {
     const label = prompt("What's the task name?");
-    setTasks([...tasks, { label, id: label.toLowerCase(), column: columnId }]);
+    label &&
+      setTasks([
+        ...tasks,
+        { label, id: label.toLowerCase(), column: columnId },
+      ]);
+  };
+
+  const handleClickDeleteTask = (taskId) => {
+    setTasks(tasks.filter((task) => task.id !== taskId));
+  };
+
+  const getTasksByColumnId = (tasks, columnId) => {
+    return tasks.filter((task) => task.column === columnId);
   };
 
   return (
@@ -55,20 +71,26 @@ function App() {
           <div key={column.id} className="column">
             <h2>{column.label}</h2>
 
-            {tasks
-              .filter((task) => task.column === column.id)
-              .map((task) => (
-                <p className="task" key={task.id}>
-                  {task.label}
-                  <button style={{ marginLeft: 5 }}>Delete</button>
-                </p>
-              ))}
+            {getTasksByColumnId(tasks, column.id).map((task) => (
+              <p className="task" key={task.id}>
+                {task.label}
+                <button
+                  style={{ marginLeft: 5 }}
+                  onClick={() => handleClickDeleteTask(task.id)}
+                >
+                  Delete
+                </button>
+              </p>
+            ))}
 
             <button onClick={() => handleClickAddTask(column.id)}>
               Add Task
             </button>
-            {/* Show only if column has no tasks */}
-            <button>Remove Column</button>
+            {getTasksByColumnId(tasks, column.id).length <= 0 && (
+              <button onClick={() => handleClickDeleteColumn(column.id)}>
+                Remove Column
+              </button>
+            )}
           </div>
         ))}
 
