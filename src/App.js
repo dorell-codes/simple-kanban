@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import Container from "./components/Container";
+import Button from "./components/Button";
+import Columns from "./components/Columns";
 
 let initialColumns = [
   {
@@ -33,8 +36,19 @@ let initialTasks = [
 ];
 
 function App() {
-  const [columns, setColumns] = useState(initialColumns);
-  const [tasks, setTasks] = useState(initialTasks);
+  const [columns, setColumns] = useState(null);
+  const [tasks, setTasks] = useState(null);
+  console.log("App -> tasks", tasks);
+
+  React.useEffect(() => {
+    fetch((process.env.API_URL || "http://localhost:1337") + "/columns")
+      .then((res) => res.json())
+      .then((result) => setColumns(result));
+
+    fetch((process.env.API_URL || "http://localhost:1337") + "/tasks")
+      .then((res) => res.json())
+      .then((result) => setTasks(result));
+  }, []);
 
   const handleClickAddColumn = (e) => {
     const label = prompt("What's the column name?");
@@ -47,6 +61,25 @@ function App() {
 
   const handleClickAddTask = (columnId) => {
     const label = prompt("What's the task name?");
+
+    if (label) {
+      fetch((process.env.API_URL || "http://localhost:1337") + "/tasks", {
+        method: "POST",
+        body: JSON.stringify({
+          label,
+          column: columnId,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          console.log("result", result);
+          setTasks((prevTasks) => [...prevTasks, result]);
+        });
+    }
+
     label &&
       setTasks([
         ...tasks,
@@ -59,45 +92,28 @@ function App() {
   };
 
   const getTasksByColumnId = (tasks, columnId) => {
-    return tasks.filter((task) => task.column === columnId);
+    return tasks.filter((task) => task.column.id === columnId);
   };
 
   return (
     <div>
       <h1>Simple Kanban</h1>
 
-      <div className="container">
-        {columns.map((column) => (
-          <div key={column.id} className="column">
-            <h2>{column.label}</h2>
-
-            {getTasksByColumnId(tasks, column.id).map((task) => (
-              <p className="task" key={task.id}>
-                {task.label}
-                <button
-                  style={{ marginLeft: 5 }}
-                  onClick={() => handleClickDeleteTask(task.id)}
-                >
-                  Delete
-                </button>
-              </p>
-            ))}
-
-            <button onClick={() => handleClickAddTask(column.id)}>
-              Add Task
-            </button>
-            {getTasksByColumnId(tasks, column.id).length <= 0 && (
-              <button onClick={() => handleClickDeleteColumn(column.id)}>
-                Remove Column
-              </button>
-            )}
-          </div>
-        ))}
+      <Container>
+        <Columns
+          data={{ columns, tasks }}
+          actions={{
+            handleClickDeleteTask,
+            handleClickAddTask,
+            handleClickDeleteColumn,
+          }}
+          getTasksByColumnId={getTasksByColumnId}
+        />
 
         <div>
-          <button onClick={handleClickAddColumn}>Add Column</button>
+          <Button onClick={handleClickAddColumn}>Add Column</Button>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }
