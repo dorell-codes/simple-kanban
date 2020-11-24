@@ -1,0 +1,32 @@
+Intro
+  - About the app
+  - The goals of the app
+  - The phases to create such app
+
+Simple:
+  - Thinking in React
+  - Manual HTML and styling
+  - Improve styling with styled-components and Components refactoring
+
+Integration 3rd party libraries:
+  - use React Bootstrap to make our lives easier via using prebuilt components
+    - change prompt to modal
+    - change buttons to icons
+    - add confirmation before we delete the tasks
+    - add confirmation before we delete the column
+
+Integration with backend:
+  - modeling our data with Strapi
+  - interacting with our API to persist data
+
+Extras:
+  - implement drag and drop for tasks
+
+Further:
+  - Add authentication - login/logout
+  - View individual tasks on another route and/or page
+
+Extra Credits:
+  - Assign tasks to a specific user to identify the owner
+  - Allow other users to comment on a given task
+  - Assign label to tasks - Priority, 
